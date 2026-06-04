@@ -1,0 +1,20 @@
+GMR Home Loan Information
+
+Minimum Down Payment:
+20 percent
+
+Loan Tenure Options:
+5 years
+10 years
+15 years
+20 years
+25 years
+30 years
+
+Interest rates depend on partner banks.
+
+Final EMI depends on:
+- Loan amount
+- Loan tenure
+- Interest rate
+- Bank approval
