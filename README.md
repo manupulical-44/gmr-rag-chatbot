@@ -174,3 +174,49 @@ Open the local Streamlit URL shown in the terminal.
 Manu Pulical
 
 Built as a learning project to understand Retrieval-Augmented Generation (RAG), embeddings, semantic search, Groq LLM integration, and Streamlit application development.
+
+## Demo Capabilities
+
+The chatbot can:
+
+- Answer questions about 2 BHK, 3 BHK, and 4 BHK apartments
+- Provide pricing and availability information
+- Explain booking amount and required documents
+- Provide EMI and loan tenure information
+- Explain cancellation policies
+- Maintain conversation context for follow-up questions
+- Politely reject unrelated queries
+- Interact in a conversational real-estate executive style
+
+
+## Features
+
+- Retrieval Augmented Generation (RAG)
+- Sentence Transformer Embeddings
+- Cosine Similarity Search
+- Groq LLM Integration
+- Streamlit Chat Interface
+- Conversation Memory
+- Greeting Detection
+- Irrelevant Query Filtering
+- Similarity Threshold Validation
+- Real Estate Executive Style Responses
+- Context-Aware Follow-up Questions
+
+
+## Enhancements Based on Manager Feedback
+
+The chatbot was enhanced to provide a more natural and user-friendly conversational experience.
+
+### Improvements Added
+
+- Added greeting support (Hi, Hello, Good Morning, etc.)
+- Added conversational real-estate executive style responses
+- Added conversation memory for follow-up questions
+- Added irrelevant query detection and rejection
+- Added similarity threshold validation
+- Added ChatGPT-style Streamlit chat interface
+- Improved prompt engineering for grounded responses
+- Improved overall user experience and interaction flow
+
+
