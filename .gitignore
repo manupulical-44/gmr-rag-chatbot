@@ -1,3 +1,11 @@
+data/realtor-data.csv
+database/cleaned_properties.csv
+database/property_data.csv
+database/property_descriptions.csv
+database/property_data_sample.csv
+database/property_descriptions_sample.csv
+database/property_embeddings_sample.npy
+faiss_index/property_index.faiss
 venv/
 .env
 __pycache__/

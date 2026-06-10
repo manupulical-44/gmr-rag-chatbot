@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 st.set_page_config(
     page_title="GMR Real Estate Chatbot",
     page_icon="🏢",
-    layout="centered"
+    layout="centered" 
 )
 
 load_dotenv()
