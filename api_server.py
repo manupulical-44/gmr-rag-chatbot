@@ -1,15 +1,11 @@
 import os
-from typing import Any
 
-import faiss
-import numpy as np
-import pandas as pd
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
 from groq import Groq
-from sentence_transformers import SentenceTransformer
+from groq import APIConnectionError, APIStatusError, RateLimitError
+from pydantic import BaseModel, Field
 
 load_dotenv()
 
@@ -23,7 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+groq_api_key = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=groq_api_key) if groq_api_key else None
 
 
 class ChatRequest(BaseModel):
@@ -33,56 +30,27 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
-    sources: list[str] = Field(default_factory=list)
     status: str = "success"
 
 
-def load_model() -> SentenceTransformer:
-    return SentenceTransformer("all-MiniLM-L6-v2")
+def generate_answer(question: str, history: list[dict[str, str]]) -> str:
+    if client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="GROQ_API_KEY is not configured on the server.",
+        )
 
-
-def load_index() -> faiss.Index:
-    return faiss.read_index("faiss_index/property_index.faiss")
-
-
-def load_data() -> pd.DataFrame:
-    return pd.read_csv("database/property_data_sample.csv")
-
-
-MODEL = load_model()
-INDEX = load_index()
-PROPERTY_DF = load_data()
-
-
-def build_context(question: str, top_k: int = 5) -> list[str]:
-    query_embedding = MODEL.encode([question]).astype("float32")
-    _, indices = INDEX.search(query_embedding, k=top_k)
-
-    descriptions: list[str] = []
-    for idx in indices[0]:
-        if idx < 0 or idx >= len(PROPERTY_DF):
-            continue
-        row = PROPERTY_DF.iloc[idx]
-        descriptions.append(str(row.get("description", "")))
-
-    return descriptions
-
-
-def generate_answer(question: str, history: list[dict[str, str]], context: list[str]) -> str:
     history_text = "\n".join(f"{item.get('role', 'user')}: {item.get('content', '')}" for item in history[-10:])
-    context_text = "\n\n".join(context)
 
     prompt = f"""
 You are a professional Real Estate AI Assistant.
 
-Use only the Context to answer the user.
-If the context does not contain the answer, say you could not find that information in the property database.
+Answer clearly and professionally using the user's real-estate intent.
+Do not invent property details or prices.
+If the user asks for something unavailable, say you cannot confirm it from the current assistant setup.
 
 Conversation History:
 {history_text}
-
-Context:
-{context_text}
 
 User Question:
 {question}
@@ -90,19 +58,25 @@ User Question:
 Answer:
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
-        max_tokens=500,
-    )
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=500,
+        )
+    except (APIConnectionError, APIStatusError, RateLimitError) as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Groq request failed: {exc.__class__.__name__}",
+        ) from exc
 
     return response.choices[0].message.content
 
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "groq_configured": str(bool(client)).lower()}
 
 
 @app.post("/api/chat", response_model=ChatResponse)
@@ -111,7 +85,6 @@ def chat(payload: ChatRequest) -> ChatResponse:
     if not message:
         raise HTTPException(status_code=400, detail="message is required")
 
-    context = build_context(message)
-    reply = generate_answer(message, payload.history, context)
+    reply = generate_answer(message, payload.history)
 
-    return ChatResponse(reply=reply, sources=context[:3], status="success")
+    return ChatResponse(reply=reply, status="success")
