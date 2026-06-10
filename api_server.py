@@ -79,6 +79,17 @@ def health() -> dict[str, str]:
     return {"status": "ok", "groq_configured": str(bool(client)).lower()}
 
 
+@app.get("/")
+@app.get("/api")
+def root() -> dict[str, str]:
+    return {
+        "status": "ok",
+        "message": "GMR Real Estate API is running.",
+        "health": "/api/health",
+        "chat": "/api/chat",
+    }
+
+
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(payload: ChatRequest) -> ChatResponse:
     message = payload.message.strip()
