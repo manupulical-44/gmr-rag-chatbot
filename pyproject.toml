@@ -1,3 +1,7 @@
 [tool.vercel]
-entrypoint = "api_server:app"[tool.vercel]
 entrypoint = "api_server:app"
+
+[project]
+name = "gmr-real-estate-api"
+version = "0.1.0"
+dependencies = ["fastapi==0.136.3", "groq==1.4.0", "python-dotenv==1.2.2", "uvicorn==0.48.0"]
