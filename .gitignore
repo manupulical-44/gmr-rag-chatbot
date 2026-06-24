@@ -19,6 +19,12 @@ faiss_index/
 *.faiss
 *.csv
 
+# Stale root files / unused backend artifacts
+api_server.py
+build_full_index.py
+retrieval.py
+requirements.txt
+
 # Vercel
 .vercel
 
