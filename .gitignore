@@ -1,19 +1,28 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+
+# Frontend
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
-data/realtor-data.csv
-database/cleaned_properties.csv
-database/property_data.csv
-database/property_descriptions.csv
-database/property_data_sample.csv
-database/property_descriptions_sample.csv
-database/property_embeddings_sample.npy
-faiss_index/property_index.faiss
-venv/
-.env
-__pycache__/
-*.pyc
-.streamlit/
-.vercel/
-uv.lock
+
+# Data / ML (not needed for deployment)
+data/
+database/
+faiss_index/
+*.npy
+*.faiss
+*.csv
+
+# Vercel
 .vercel
+
+# Misc
+uv.lock
+*.bak
+.streamlit/
